@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>線上命盤</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap-datepicker3.min.css">
+    <style>
+@media only screen and (max-width: 768px) {
+
+
+
+/* The Overlay (background) */
+.overlay {
+  /* Height & width depends on how you want to reveal the overlay (see JS below) */   
+  height: 100%;
+  width: 100%;
+  display: none;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  color: rgb(255,255,255);
+  background-color: rgb(0,0,0); /* Black fallback color */
+  background-color: rgba(0,0,0, 0.9); /* Black w/opacity */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+/* Position the content inside the overlay */
+.overlay-content {
+  position: relative;
+  top: 25%; /* 25% from the top */
+  width: 100%; /* 100% width */
+  text-align: center; /* Centered text/links */
+  margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+}
+
+/* The navigation links inside the overlay */
+.overlay a {
+  padding: 8px;
+  text-decoration: none;
+  font-size: 36px;
+  color: #818181;
+  display: block; /* Display block instead of inline */
+  transition: 0.3s; /* Transition effects on hover (color) */
+}
+
+/* When you mouse over the navigation links, change their color */
+.overlay a:hover, .overlay a:focus {
+  color: #f1f1f1;
+}
+
+/* Position the close button (top right corner) */
+.overlay .closebtn {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+}
+}
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+  .overlay a {font-size: 20px}
+  .overlay .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+}        
+    </style>
+</head>
+<body class="bg-light">
+<div class="container">
+ <!-- The overlay -->
+<div id="myNav" class="overlay" >
+
+  <!-- Button to close the overlay navigation -->
+  <a href="javascript:void(0)" class="closebtn d-md-none  d-lg-none d-xl-none" onclick="closeNav();">&times;</a>
+
+  <!-- Overlay content -->
+  <div class="overlay-content">
+        <div class="container">
+            <div>
+                <div class="row g-5">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label for="pz-name" class="form-label"><b>姓名</b></label>
+                            <input type="text" id="pz-name" class="form-control form-control-sm" maxlength="16" placeholder="請輸入您的姓名">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pz-birthday" class="form-label"><b>出生年月日(西元)</b></label>
+                            <input type="text" id="pz-birthday" data-inputmask="'alias': 'yyyy-mm-dd'" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label for="pz-hour" class="form-label"><b>時辰</b></label>
+                            <select id="pz-hour" class="form-control form-control-sm" >
+                                <option value="子">子 (23時至01時)</option>
+                                <option value="丑">丑 (01時至03時)</option>
+                                <option value="寅">寅 (03時至05時 )</option>
+                                <option value="卯">卯 (05時至07時)</option>
+                                <option value="辰">辰 (07時至09時)</option>
+                                <option value="巳">巳 (09時至11時)</option>
+                                <option value="午">午 (11時至13時)</option>
+                                <option value="未">未 (13時至15時)</option>
+                                <option value="申">申 (15時至17時)</option>
+                                <option value="酉">酉 (17時至19時)</option>
+                                <option value="戌">戌 (19時至21時)</option>
+                                <option value="亥">亥 (21時至23時)</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 col-md-3 col-lg-4 col-xl-3 ">
+                                <label for="pz-gender" class="form-label"><b>姓別</b></label>
+                                <div class="mb-3">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="pz-gender" id="pz-gender-0" value="女">
+                                        <label class="form-check-label" for="pz-gender-0">女</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="pz-gender" id="pz-gender-1" value="男">
+                                        <label class="form-check-label" for="pz-gender-1">男</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6  col-md-4 col-lg-5 col-xl-5 ">
+                                <label for="pz-type" class="form-label"><b>命盤排法</b></label>
+                                <div class="mb-3">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="pz-type" id="pz-type-0" value="天盤">
+                                        <label class="form-check-label" for="pz-type-0">天盤</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="pz-type" id="pz-type-1" value="地盤">
+                                        <label class="form-check-label" for="pz-type-1">地盤</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="pz-type" id="pz-type-2" value="人盤" >
+                                        <label class="form-check-label" for="pz-type-2">人盤</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5  col-lg-3 col-xl-4 d-none d-md-block d-lg-block d-xl-block">
+                                <a href="/download" name="download-pdf" role="button" class="btn btn-primary btn-sm btn-block">下載PDF</a>
+                                <a href="" name="create-image" role="button" class="btn btn-secondary btn-sm btn-block">下載圖檔</a>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+                <div class="row g-5">
+                    <div class="col-12">
+                    <button type="button" class="btn btn-info  d-md-none  d-lg-none d-xl-none" onclick="closeNav();">
+                        <!-- <i class="fas fa-align-left"></i> -->
+                        確定
+                    </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+  </div>
+
+</div>
+
+<!-- Use any element to open/show the overlay navigation menu -->
+
+                    <button type="button"  class="btn btn-info  d-md-none  d-lg-none d-xl-none" onclick="openNav();">
+                        <!-- <i class="fas fa-align-left"></i> -->
+                        <span>輸入生辰資料</span>
+                    </button>
+                <div >
+                    <svg id="ziewi"></svg>
+                </div>
+                <div class=" d-block d-sm-none d-none d-sm-block d-md-none">
+                    <div class="row g-5">
+                        <div class="col-6">
+                            <a href="/download" role="button" class="btn btn-primary btn-sm btn-block">下載PDF</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="" name="create-image" role="button" class="btn btn-secondary btn-sm btn-block">下載圖檔</a>
+                        </div>
+                    </div>
+                </div>
+
+
+</div>
+<script src="/assets/js/jquery-3.6.0.min.js"></script>
+<script src="/assets/js/popper.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/jquery.inputmask.bundle.min.js"></script>
+<script src="/assets/js/jquery.snap.js"></script>
+<script src="/assets/js/snap.svg-min.js"></script>
+<script src="/assets/js/bootstrap-datepicker.min.js"></script>
+<script src="/assets/js/bootstrap-datepicker.zh-TW.min.js"></script>
+<script src="/assets/js/saveSvgAsPng.js"></script>
+<script>
+/* Open when someone clicks on the span element */
+function openNav() {
+  document.getElementById("myNav").style.display = "block";
+}
+
+/* Close when someone clicks on the "x" symbol inside the overlay */
+function closeNav() {
+  document.getElementById("myNav").style.display = "none";
+}
+var isValidDate = function(dateString) {
+    var regEx = /^\d{4}-\d{2}-\d{2}$/;
+    if(!dateString.match(regEx)) return false;    // Invalid format
+    var d = new Date(dateString);
+    var dNum = d.getTime();
+    if(!dNum && dNum !== 0) return false; // NaN value, Invalid date
+    return d.toISOString().slice(0,10) === dateString;
+};
+var updatePizza = function(data,runPushState){
+    $.ajax({
+        url: '/pizza',
+        dataType: 'json',
+        method:'get',
+        data: data,
+        contentType : 'application/json; charset=utf-8',
+        success:function(r){
+            $('#ziewi').empty();
+            r = $.extend(true , {} ,r,{pdfDocument:{margin:{x: 5, y: 5}},svgId:'ziewi'});
+            $("a[name=create-image]").attr("export-filename",r.profile.exportFilename);
+            $(document).snap("update",r);
+            // Current URL: https://my-website.com/page_a
+            const nextURL = '/pizza/'+
+                                r.lunarBirth.name+'/'+
+                                r.lunarBirth.AD.y.toString() +'/'+
+                                r.lunarBirth.AD.m.toString() +'/'+
+                                r.lunarBirth.AD.d.toString() +'/'+
+                                r.lunarBirth.h +'/'+
+                                r.lunarBirth.gender_text +'/'+
+                                r.lunarBirth.type_text;
+            const downloadURL = '/download/'+
+                                r.lunarBirth.name+'/'+
+                                r.lunarBirth.AD.y.toString() +'/'+
+                                r.lunarBirth.AD.m.toString() +'/'+
+                                r.lunarBirth.AD.d.toString() +'/'+
+                                r.lunarBirth.h +'/'+
+                                r.lunarBirth.gender_text +'/'+
+                                r.lunarBirth.type_text;
+            $("a[name=download-pdf]").attr("href",downloadURL);
+
+            if(runPushState == true){
+                // This will create a new entry in the browser's history, without reloading
+                window.history.pushState(null, null, nextURL);
+            
+                // This will replace the current entry in the browser's history, without reloading
+                window.history.replaceState(null, null, nextURL);
+            }
+            $("#pz-birthday").val(r.lunarBirth.AD.y.toString()+"-"+r.lunarBirth.AD.m.toString().padStart(2, "0")+"-"+r.lunarBirth.AD.d.toString().padStart(2, "0"));
+        }
+    });    
+};
+if (window.history && window.history.pushState) {
+    $(window).on('popstate', function() {
+        var    pathname = window.location.pathname
+        var segment = pathname.split("/");
+        var gender = 0;
+        var type = 0;
+        if(segment[1] == "pizza"){
+            $("#pz-name").val(decodeURIComponent(segment[2]));
+            $("#pz-birthday").val(segment[3].toString()+"-"+segment[4].padStart(2, "0")+"-"+segment[5].padStart(2, "0"));
+            $("#pz-hour").val(decodeURIComponent(segment[6]));
+            switch(segment[7]){
+                case  "男":
+                    gender = 1;
+                break;
+                case  "女":
+                    gender = 0;
+                break;
+            }
+            $("#pz-gender-"+gender).prop("checked" , true);
+            switch(segment[8]){
+                case  "天盤":
+                    type = 0;
+                break;
+                case  "地盤":
+                    type = 1;
+                break;
+                case  "人盤":
+                    type = 2;
+                break;
+            }
+            $("#pz-type-"+type).prop("checked" , true);
+            updatePizza({
+                name:decodeURIComponent(segment[2]),
+                y:segment[3].toString(),
+                m:segment[4].toString(),
+                d:segment[5].toString(),
+                h:decodeURIComponent(segment[6]),
+                g:decodeURIComponent(segment[7]),
+                t:decodeURIComponent(segment[8])
+            });
+        }
+    });
+} 
+$(function(){
+    var r = $.extend(true,{},___JSON_PROFILE___,{pdfDocument:{margin:{x:5,y:5}},svgId:'ziewi'});
+    var downloadURL = '/download/'+
+                                r.lunarBirth.name+'/'+
+                                r.lunarBirth.AD.y.toString() +'/'+
+                                r.lunarBirth.AD.m.toString() +'/'+
+                                r.lunarBirth.AD.d.toString() +'/'+
+                                r.lunarBirth.h +'/'+
+                                r.lunarBirth.gender_text +'/'+
+                                r.lunarBirth.type_text;
+    $("a[name=download-pdf]").attr("href",downloadURL);
+
+    $(document).snap(r);
+    $("#pz-gender-"+r.lunarBirth.gender).attr("checked",true);
+    $("#pz-type-"+r.lunarBirth.type).attr("checked", true);
+
+    $("#pz-name")
+        .val(r.lunarBirth.name)
+        .on("blur",function(){
+            updatePizza({name:$(this).val()},true);
+        });
+    $("#pz-hour")
+        .val(r.lunarBirth.h)
+        .on("change",function(){
+            updatePizza({h:$(this).val()},true);
+        });
+    $("input[name=pz-gender]").on("change",function(){
+        updatePizza({g:$(this).val()},true);
+    });
+    $("input[name=pz-type]").on("change",function(){
+        updatePizza({t:$(this).val()},true);
+    });
+    $('#pz-birthday')
+        .val(r.lunarBirth.AD.y.toString()+"-"+r.lunarBirth.AD.m.toString()+"-"+r.lunarBirth.AD.d.toString())
+        .inputmask()
+        .datepicker({
+            format: "yyyy-mm-dd",
+            language: "zh-TW",
+            autoclose: true
+        })
+        .change(function () { 
+            var birthday = $(this).val();
+            if(isValidDate(birthday)){
+                updatePizza({
+                    y:parseInt(birthday.substr(0,4),10),
+                    m:parseInt(birthday.substr(5,2),10),
+                    d:parseInt(birthday.substr(8,2),10)
+                },true);
+            }
+        });
+    $("a[name=create-image]").attr("export-filename",r.profile.exportFilename).on("click",function(e){
+        e.preventDefault();
+        saveSvgAsPng(document.getElementById("ziewi"), $(this).attr("export-filename") , {backgroundColor:'white',scale:1.5,left:0,top:0});
+    });
+});
+</script>
+</body>
+</html>
+

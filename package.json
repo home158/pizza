@@ -1,0 +1,22 @@
+{
+  "name": "pizza",
+  "version": "1.0.0",
+  "description": "紫微斗數",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies":{
+    "is-my-date-valid":"0.1.1",
+    "lunar-calendar":"0.1.4",
+    "sprintf":"0.1.5",
+    "pad-left":"2.1.0",
+    "pad-right":"0.2.2",
+    "pdfkit":"0.15.1",
+    "blob-stream":"0.1.3",
+    "dotenv":"16.4.5"
+  }
+}
