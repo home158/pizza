@@ -3,8 +3,8 @@ module.exports = {
 	//個人資料
     profile_lunar_birth: "%s年%s%s日%s時",
     profile_birth: "%s 國曆 %s 年 %s 月 %s 日",
-    slogan: '許願老爹．紫微算命',
-	base_url: "http://www.iwishdaddy.com",
+    slogan: '紫微斗數',
+	base_url: "",
 	chinese_numerals : [
 		'一','二','三','四','五','六','七','八','九','十',
 		'十一','十二','十三','十四','十五','十六','十七','十八','十九','廿十',

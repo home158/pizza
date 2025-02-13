@@ -263,6 +263,7 @@ module.exports = {
 		this.setp28_calculate();
 		this.setp29_calculate();
 		this.setp30_calculate();
+		this.setp31_calculate();
 		this.setp99_calculate();
 
 		this.svgLayout();
@@ -371,6 +372,7 @@ module.exports = {
 		this.setp28_calculate();
 		this.setp29_calculate();
 		this.setp30_calculate();
+		this.setp31_calculate();
 		this.setp99_calculate();
 
 		this.textProfileLayout();
@@ -1189,6 +1191,50 @@ module.exports = {
 		var n = Math.abs( m + 1 ) % 12;
 		this.pizza[n].magnitude1.data.push('劫殺');				
 
+	},
+	/*
+	*  旬空
+	*
+	*/
+	setp31_calculate: function(){
+		const cname = "旬空"
+		// 定義天干 (0-9) 和地支 (0-11)
+		const tianGan = [...Array(10).keys()]; // 產生 [0,1,2,3,4,5,6,7,8,9]
+		const diZhi = [...Array(12).keys()];   // 產生 [0,1,2,3,4,5,6,7,8,9,10,11]
+
+		// 生成一甲子 (60 個循環組合)
+		const jiaZi = Array.from({ length: 60 }, (_, i) => [
+			tianGan[i % 10], 
+			diZhi[i % 12]
+		]);
+
+		// 查詢特定 (天干, 地支) 在 60 組中的序號
+		function findIndex(tg, dz) {
+			return jiaZi.findIndex(([t, d]) => t === tg && d === dz);
+		}
+
+		// 印出 60 組 (天干, 地支)
+
+		m = this.retrieveDecimalIndex(this.lunarBirth.y.decimal);
+		n = this.retrieveDuodecimalIndex(this.lunarBirth.y.duodecimal);
+		const query = [m, n];
+		nullIndex = findIndex(...query)
+		const nullStarIndex = Math.floor(nullIndex / 10);
+		nullStar1 = [10,8,6,4,2,0]
+		nullStar2 = [11,9,7,5,3,1]
+		
+		var start1 = this.relativeDuodecimalinPizzaIndex(this.earthlyBranches[nullStar1[nullStarIndex]]);
+		var start2 = this.relativeDuodecimalinPizzaIndex(this.earthlyBranches[nullStar2[nullStarIndex]]);
+		this.pizza[start1].magnitude1.data.push(cname);
+		this.pizza[start2].magnitude1.data.push(cname);
+	},	
+	relativeDuodecimalinPizzaIndex:function(duodecimal){
+		var index = 0;
+		for( i = 0; i < 12; i++ ){
+			if(this.pizza[i].step1.data[0][1] == duodecimal)
+				index = i;
+		}	
+		return index;
 	},
 	/*
 	* 標記重要的星，配合畫面呈現
