@@ -3,8 +3,8 @@ module.exports = {
 	//個人資料
     profile_lunar_birth: "%s年%s%s日%s時",
     profile_birth: "%s 國曆 %s 年 %s 月 %s 日",
-    slogan: '紫微斗數',
-	base_url: "",
+    slogan: '正向的信念+了解自己的命運=好命',
+	base_url: "💀 ASTRO-KILLERy",
 	chinese_numerals : [
 		'一','二','三','四','五','六','七','八','九','十',
 		'十一','十二','十三','十四','十五','十六','十七','十八','十九','廿十',
@@ -45,7 +45,7 @@ module.exports = {
         {name: '天魁' , mapping : [ 1, 0,11,11, 1, 0, 2, 2, 3, 3] , magnitude : 0},
         //{name: '天鉞' , mapping : [ 7, 8, 9, 9, 7, 8, 7, 2, 5, 5] , magnitude : 0},
         {name: '天鉞' , mapping : [ 7, 8, 9, 9, 7, 8, 6, 6, 5, 5] , magnitude : 0},
-        {name: '天厨' , mapping : [ 5, 6, 0, 5, 6, 8, 2, 6, 9,11] , magnitude : 1}
+        {name: '天廚' , mapping : [ 5, 6, 0, 5, 6, 8, 2, 6, 9,11] , magnitude : 1}
     ],
     
     moon_star:[
