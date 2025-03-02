@@ -3,7 +3,7 @@
 */
 
 (function($) {
-    var PLUGIN_NAME = "snap";
+    var PLUGIN_NAME = "pizzad3js";
     $.fn[PLUGIN_NAME] = function(methodOrOptions) {
         if (typeof methodOrOptions == "string") {
             var publicMethods = $.fn[PLUGIN_NAME].publicMethods[methodOrOptions];
@@ -45,20 +45,26 @@
             
             var width = $('#'+base.options.svgId).parent().width();
             var height = width * base.options.pageSize.height / base.options.pageSize.width;
-            base.snap = Snap('#'+base.options.svgId).attr({
-                width: width,
-                height: height,
-                viewBox:"0 0 "+base.options.pageSize.width+" "+base.options.pageSize.height,
-                preserveAspectRatio:"xMaxYMax"
-            });
+            base.snap = d3.select('#'+base.options.svgId)
+                .attr("width", width)   // 设定 SVG 宽度
+                .attr("height", height)  // 设定 SVG 高度
+                .attr("viewBox", "0 0 "+base.options.pageSize.width+" "+base.options.pageSize.height)  // 设定 viewBox (x, y, width, height)
+                .attr("preserveAspectRatio", "xMaxYMax"); // 设定比例缩放方式
+
+           
+
             this.rectangle(elem);
+            
             this.textProfileLayout(elem);
             this.textVerticalLayout(elem, 'step1', 'left');
             this.textHorizontalLayout(elem, 'step3','up');
             this.textVerticalLayout(elem, 'step4', 'left');
+            
+            
             this.textVerticalLayout(elem, 'magnitude0','left');
             this.textVerticalLayout(elem, 'magnitude1','right');
             this.textVerticalLayout(elem, 'magnitude2','right');
+            
         },
         render: function(elem,options){
             var that = this;
@@ -107,17 +113,35 @@
                 x: base.pizzaRect.w + base.options.pdfDocument.margin.x,
                 y: base.pizzaRect.h + base.options.pdfDocument.margin.y
             };
-            for( j = 0; j < base.locateMapping.length; j ++ ){
-                c = base.locateMapping[j];
-                p = tmpLocate[c];
-                base.options.pizza[j].locateTopLeft = p;
-                base.snap.rect(p.x, p.y, base.pizzaRect.w, base.pizzaRect.h)
-                    .attr({
-                        fill: "none",
-                        stroke: "#000",
-                        strokeWidth: 1
-                    });
-            }
+            // 綁定數據並繪製矩形
+            base.snap.selectAll("rect")
+                .data(base.locateMapping) // 綁定數據
+                .enter()
+                .append("rect")
+                .attr("x", (d, i) => {
+                    let p = tmpLocate[d]; // 取得對應的座標
+                    base.options.pizza[i].locateTopLeft = p; // 更新 pizza 位置
+                    return p.x;
+                })
+                .attr("y", (d) => tmpLocate[d].y)
+                .attr("width", base.pizzaRect.w)
+                .attr("height", base.pizzaRect.h)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .on("click", function () {
+                    let currentColor = window.getComputedStyle(this).fill; // 取得當前顏色 (確保正確)
+                    
+                    // 檢查顏色是否為 orange (RGB 格式)
+                    let isOrange = currentColor === "rgb(255, 165, 0)";
+                    let newColor = isOrange ? "white" : "orange"; // 切換顏色
+                    
+                    d3.select(this)
+                        .transition().duration(200)
+                        .attr("fill", newColor);
+                });
+    
+
             /*
             var a = base.snap.text(base.options.pdfDocument.fontSize / 2, 0, "沒有聽或不肯").attr({
                     style: "writing-mode:tb;"
@@ -148,15 +172,20 @@
                 o = base.options.pizza[i][step];
 
                 //計算第一個grid位置
-                text = base.snap.text(100, 100, o.data[0].trim()).attr({
-                    visibility: 'visible',
-                    'font-family': 'GenShinGothicRegular'
-                });   
+  
+                text = d3.select("svg")
+                .append("text")
+                .attr("x", 100) // 設定 X 位置
+                .attr("y", 100) // 設定 Y 位置
+                .attr("visibility", "visible") // 設定可見性
+                .attr("font-family", "GenShinGothicRegular") // 設定字體
+                .text(o.data[0].trim()); // 設定文字內容（去除前後空格）
+              
                 $firstGrid = this.retvieveFirstRelativePosition(elem, o , text , true);
                 o.grid[0].x = $firstGrid.x;
                 o.grid[0].y = $firstGrid.y;
                 r = this.relativeGrid2AbsolutePosition(elem, o.grid[0].x, o.grid[0].y, base.options.pizza[i].locateTopLeft);
-                text.attr(r);
+                text.attr("x", r.x).attr("y", r.y);
                 for( j = 1; j < o.data.length; j++){
                     next = j;
                     //下一個坐標
@@ -173,20 +202,27 @@
                         }
                     }
                     if(o.alignment.x == 'center'){
-                        text = base.snap.text(100, 100, o.data[next].trim()).attr({
-                            visibility: 'visible',
-                            'font-family': 'GenShinGothicRegular'
-                        });  
+                        text = d3.select("svg")
+                        .append("text")
+                        .attr("x", 100) // 設定 X 位置
+                        .attr("y", 100) // 設定 Y 位置
+                        .attr("visibility", "visible") // 設定可見性
+                        .attr("font-family", "GenShinGothicRegular") // 設定字體
+                        .text(o.data[next].trim()); // 設定文字內容（去除前後空格）
+                      
                         $firstGrid = this.retvieveFirstRelativePosition(elem, o , text , true);
                         o.grid[next].x = $firstGrid.x;
                         r = this.relativeGrid2AbsolutePosition(elem, o.grid[next].x, o.grid[next].y, base.options.pizza[i].locateTopLeft);
-                        text.attr(r);
+                        text.attr("x", r.x).attr("y", r.y);
                     }else{
                         r = this.relativeGrid2AbsolutePosition(elem, o.grid[next].x, o.grid[next].y, base.options.pizza[i].locateTopLeft);
-                        text = base.snap.text(r.x, r.y, o.data[j].trim()).attr({
-                            visibility: 'visible',
-                            'font-family': 'GenShinGothicRegular'
-                        });
+                        text = d3.select("svg")
+                        .append("text")
+                        .attr("x", r.x) // 設定 X 位置
+                        .attr("y", r.y) // 設定 Y 位置
+                        .attr("visibility", "visible") // 設定可見性
+                        .attr("font-family", "GenShinGothicRegular") // 設定字體
+                        .text(o.data[j].trim()); // 設定文字內容（去除前後空格）
                     }
                 }
             }
@@ -197,41 +233,54 @@
             /**********************************************/
              var i, r, text, j, o, next, 
                 alignment = alignment || 'right';
+            
             for( i = 0; i < 12; i++ ){
                 o = base.options.pizza[i][step];
                 //計算第一個grid位置
-                text = base.snap.text(50, 50, o.data[0]).attr({
-                    style: "writing-mode:tb;",
-                    visibility: 'visible',
-                    'font-family': 'GenShinGothicRegular'
-                });
+                text = d3.select("svg")
+                .append("text")
+                .attr("x", 50)
+                .attr("y", 50)
+                .attr("writing-mode", "tb")
+                .attr("visibility", "visible")
+                .attr("font-family", "GenShinGothicRegular")
+                .text(o.data[0]);
+              
+                
                 if(step == "step4"){
-                    text.attr({fill:"purple"});
+                    text.attr("fill", "purple");
                 }
+                
                 $firstGrid = this.retvieveFirstRelativePosition(elem, o , text);
                 o.grid[0].x = $firstGrid.x;
                 o.grid[0].y = $firstGrid.y;
                 r = this.relativeGrid2AbsolutePosition(elem, o.grid[0].x, o.grid[0].y, base.options.pizza[i].locateTopLeft);
-                text.attr(r);
+                text.attr("x", r.x).attr("y", r.y);
                 if(o.symbol){
                     if(o.symbol[0] == "circle"){
-                        var c = base.snap.circle(r.x + $firstGrid.w * 0.09, r.y + $firstGrid.w *2.45, 10)
-                                    .attr({
-                                        fill: "none",
-                                        stroke: "#F00",
-                                        strokeWidth: 1
-                                    });
+                        // 在 SVG 中新增一個圓形
+                        var c = d3.select("svg")
+                        .append("circle")
+                        .attr("cx", r.x + $firstGrid.w * 0.09)  // 設定圓心 X 座標
+                        .attr("cy", r.y + $firstGrid.w * 2.45)  // 設定圓心 Y 座標
+                        .attr("r", 10)                          // 設定圓半徑
+                        .attr("fill", "none")                   // 無填充色
+                        .attr("stroke", "#F00")                 // 紅色邊框
+                        .attr("stroke-width", 1);               // 邊框寬度
+
                     }
                     if(o.symbol[0] == "triangle"){
-                        text.attr({fill:"red"});
-                            var x = r.x-5;
-                            var y = r.y-3;
-                            var len = 13;
-                       var c = base.snap.polygon(x,y,x+len/2,y-len/2*1.732,x+len,y)
-                                    .attr({
-                                        fill: "#F00",
-                                        stroke: "#F00"
-                                    });
+                        
+                        text.attr("fill","red");
+                        var x = r.x-5;
+                        var y = r.y-3;
+                        var len = 13;
+                        
+                        var c = d3.select("svg")
+                        .append("polygon")
+                        .attr("points", `${x},${y} ${x + len / 2},${y - (len / 2) * 1.732} ${x + len},${y}`)
+                        .attr("fill", "#F00")   // 設定填充顏色為紅色
+                        .attr("stroke", "#F00"); // 設定邊框顏色為紅色
                     }
                 }
                 
@@ -250,60 +299,86 @@
                             }
                         }
                         r = this.relativeGrid2AbsolutePosition(elem, o.grid[next].x, o.grid[next].y, base.options.pizza[i].locateTopLeft);
-                        text = base.snap.text(r.x, r.y, o.data[j]).attr({
-                            style: "writing-mode:tb;",
-                            visibility: 'visible',
-                            'font-family': 'GenShinGothicRegular'
-                        });
+                        
                         if(step == "step4"){
-                            text.attr({fill:"purple"});
+                            text.attr("fill","purple");
                         }
-
+                        
+                        text = d3.select("svg")
+                        .append("text")
+                        .attr("x", r.x) // 設定 X 位置
+                        .attr("y", r.y) // 設定 Y 位置
+                        .attr("writing-mode", "tb") // 設定文字書寫方向
+                        .attr("visibility", "visible") // 讓文字可見
+                        .attr("font-family", "GenShinGothicRegular") // 設定字體
+                        .text(o.data[j]); // 設定文字內容
+                      
                     }
                     if(o.symbol){
                         if(o.symbol[j] == "circle"){
-                            var c = base.snap.circle(r.x + $firstGrid.w * 0.09, r.y + $firstGrid.w *2.45, 10)
-                                    .attr({
-                                        fill: "none",
-                                        stroke: "#F00",
-                                        strokeWidth: 1
-                                    });
+                            
+                            var c = d3.select("svg")
+                            .append("circle")
+                            .attr("cx", r.x + $firstGrid.w * 0.09) // 設定圓心 X 座標
+                            .attr("cy", r.y + $firstGrid.w * 2.45) // 設定圓心 Y 座標
+                            .attr("r", 10)                         // 設定圓半徑
+                            .attr("fill", "none")                   // 無填充色
+                            .attr("stroke", "#F00")                 // 紅色邊框
+                            .attr("stroke-width", 1);               // 邊框寬度
                         }
                         if(o.symbol[j] == "triangle"){
-                            text.attr({fill:"red"});
+                            text.attr("fill","red");
                             var x = r.x-5;
                             var y = r.y-3;
                             var len = 13;
-                            var c = base.snap.polygon(x,y,x+len/2,y-len/2*1.732,x+len,y)
-                                    .attr({
-                                        fill: "#F00",
-                                        stroke: "#F00"
-                                    });
+                            
+                            var c = d3.select("svg")
+                            .append("polygon")
+                            .attr("points", `${x},${y} ${x + len / 2},${y - (len / 2) * 1.732} ${x + len},${y}`)
+                            .attr("fill", "#F00")   // 設定填充顏色為紅色
+                            .attr("stroke", "#F00"); // 設定邊框顏色為紅色
                         }
                     }
                 }
             }
         },
+
+        
         textProfileLayout: function(elem){
             var that = this;
                 base = that.getData( elem );
             /**********************************************/
             var o;
             o = base.options.profile;
-            for( j = 0; j < o.data.length; j++){
+            base.snap.selectAll("text")
+            .data(o.data)
+            .enter()
+            .append("text")
+            .text(d => d)
+            .attr("font-family", "GenShinGothicRegular")
+            .attr("visibility", "visible")
+            .attr("writing-mode", (d, i) => o.alignment[i]?.mode || "tb")
+            .each(function (d, i) {
                 
-                var text = base.snap.text(50, 50, o.data[j]).attr({
-                    style: 'writing-mode:'+o.alignment[j].mode || 'tb' +';',
-                    visibility: 'visible',
-                    'font-family': 'GenShinGothicRegular'
-                });
-                grid = this.retvieveRelativePosition(elem, o.alignment[j] , text);
-                //console.log(grid);
-                o.grid[j].x = grid.x;
-                o.grid[j].y = grid.y;
-                r = this.relativeGrid2AbsolutePosition(elem,  o.grid[j].x, o.grid[j].y, base.profile.locateTopLeft);
-                text.attr(r);
-            }
+                let textElem = d3.select(this);
+                let grid = that.retvieveRelativePosition(elem, o.alignment[i], textElem);
+
+                o.grid[i].x = grid.x;
+                o.grid[i].y = grid.y;
+        
+                let absolutePos = that.relativeGrid2AbsolutePosition(
+                    elem, o.grid[i].x, o.grid[i].y, base.profile.locateTopLeft
+                );
+                textElem.attr("x", absolutePos.x)
+                        .attr("y", absolutePos.y);
+                let bbox = textElem.node().getBBox(); // 取得文字範圍
+                console.log(bbox)
+            })
+            .on("click", function() {
+                let currentWeight = d3.select(this).attr("font-weight"); // 取得當前字重
+                d3.select(this).attr("font-weight", currentWeight === "bold" ? "normal" : "bold"); // 切換字重
+            });
+        
         },
         retvieveFirstRelativePosition: function(elem , o , text , horizon){
             if(text == undefined){
@@ -316,9 +391,9 @@
                 return r;
             }
             horizon = horizon || false;
-            var b = text.getBBox();
-            textHeight = b.h;
-            textWidth = b.w;
+            var b = text.node().getBBox();
+            textHeight = b.height;
+            textWidth = b.width;
             if(o.alignment.x == 'left'){
                 var absX = base.options.gridPoditionMargin.left ;
             }
@@ -386,16 +461,9 @@
             var that = this;
                 base = that.getData( elem );
             /**********************************************/
-            var b = text.getBBox();
-            textHeight = b.h;
-            /*
-            base.snap.line(b.x, b.y, b.x2, b.y2).attr({
-                        fill: "none",
-                        stroke: "#000",
-                        strokeWidth: 1
-                    });
-            */
-
+            var b = text.node().getBBox();
+            textHeight = b.height;
+            
             if(typeof (alignment.x) == 'number'){
                 if(alignment.x < 0){
                     var absX = base.pizzaRect.w * 2 - base.options.gridPoditionMargin.right + alignment.x * base.options.pdfDocument.fontSize;

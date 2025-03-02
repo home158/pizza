@@ -186,17 +186,16 @@
 
 
 </div>
-<script src="/assets/js/d3.v7.min.js"></script>
 <script src="/assets/js/jquery-3.6.0.min.js"></script>
 <script src="/assets/js/popper.min.js"></script>
 <script src="/assets/js/bootstrap.min.js"></script>
 <script src="/assets/js/jquery.inputmask.bundle.min.js"></script>
-<script src="/assets/js/jquery.pizzad3js.js"></script>
+<script src="/assets/js/jquery.snap.js"></script>
+<script src="/assets/js/snap.svg-min.js"></script>
 <script src="/assets/js/bootstrap-datepicker.min.js"></script>
 <script src="/assets/js/bootstrap-datepicker.zh-TW.min.js"></script>
 <script src="/assets/js/saveSvgAsPng.js"></script>
 <script>
-    
 /* Open when someone clicks on the span element */
 function openNav() {
   document.getElementById("myNav").style.display = "block";
@@ -225,7 +224,7 @@ var updatePizza = function(data,runPushState){
             $('#ziewi').empty();
             r = $.extend(true , {} ,r,{pdfDocument:{margin:{x: 5, y: 5}},svgId:'ziewi'});
             $("a[name=create-image]").attr("export-filename",r.profile.exportFilename);
-            $(document).pizzad3js("update",r);
+            $(document).snap("update",r);
             // Current URL: https://my-website.com/page_a
             const nextURL = '/pizza/'+
                                 r.lunarBirth.name+'/'+
@@ -311,7 +310,7 @@ $(function(){
                                 r.lunarBirth.type_text;
     $("a[name=download-pdf]").attr("href",downloadURL);
 
-    $(document).pizzad3js(r);
+    $(document).snap(r);
     $("#pz-gender-"+r.lunarBirth.gender).attr("checked",true);
     $("#pz-type-"+r.lunarBirth.type).attr("checked", true);
 
