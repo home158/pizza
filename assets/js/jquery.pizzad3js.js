@@ -85,7 +85,7 @@
                 base.options = options;
             }
             this.init(elem);
-        },             
+        },
         /*
         *   畫出12宮的格子
         *
@@ -113,48 +113,51 @@
                 x: base.pizzaRect.w + base.options.pdfDocument.margin.x,
                 y: base.pizzaRect.h + base.options.pdfDocument.margin.y
             };
-            // 綁定數據並繪製矩形
-            base.snap.selectAll("rect")
-                .data(base.locateMapping) // 綁定數據
+
+            let rectGroups = base.snap.selectAll(".rect-group")
+                .data(base.locateMapping)
                 .enter()
-                .append("rect")
-                .attr("x", (d, i) => {
-                    let p = tmpLocate[d]; // 取得對應的座標
+                .append("g")
+                .attr("class", "rect-group")
+                .attr("transform", (d,i) => {
+                    let p = tmpLocate[d];
                     base.options.pizza[i].locateTopLeft = p; // 更新 pizza 位置
-                    return p.x;
+
+                    return `translate(${p.x}, ${p.y})`;
                 })
-                .attr("y", (d) => tmpLocate[d].y)
+                .each(function (d, i) {
+                    base.rectGroupsArray[i] = d3.select(this); // 存儲 g 的 D3 選擇器
+                });
+            
+            rectGroups.append("rect")
                 .attr("width", base.pizzaRect.w)
                 .attr("height", base.pizzaRect.h)
                 .attr("fill", "white")
                 .attr("stroke", "black")
                 .attr("stroke-width", 1)
                 .on("click", function () {
-                    let currentColor = window.getComputedStyle(this).fill; // 取得當前顏色 (確保正確)
-                    
-                    // 檢查顏色是否為 orange (RGB 格式)
+                    let currentColor = window.getComputedStyle(this).fill;
                     let isOrange = currentColor === "rgb(255, 165, 0)";
-                    let newColor = isOrange ? "white" : "orange"; // 切換顏色
-                    
+                    let newColor = isOrange ? "white" : "orange";
+            
                     d3.select(this)
                         .transition().duration(200)
                         .attr("fill", newColor);
                 });
-    
+                let rectCenterGroups = base.snap
+                .append("g")
+                .attr("class", "center-group")
+                .attr("transform", (d,i) => {
+                    return `translate(${tmpLocate[5].x}, ${tmpLocate[5].y})`;
+                })
+                .append("rect")
+                .attr("width", base.pizzaRect.w*2)
+                .attr("height", base.pizzaRect.h*2)
+                .attr("fill", "white")
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
 
-            /*
-            var a = base.snap.text(base.options.pdfDocument.fontSize / 2, 0, "沒有聽或不肯").attr({
-                    style: "writing-mode:tb;"
-                });
-
-            var boxdata = a.getBBox();
-            base.snap.line(boxdata.x, boxdata.y, boxdata.x2, boxdata.y2).attr({
-                        fill: "none",
-                        stroke: "#000",
-                        strokeWidth: 1
-                    });
-            */
-        },
+        },        
         /*
         *   水平寫入文字的位置
         *   @step 處理文子檔
@@ -372,7 +375,6 @@
                 textElem.attr("x", absolutePos.x)
                         .attr("y", absolutePos.y);
                 let bbox = textElem.node().getBBox(); // 取得文字範圍
-                console.log(bbox)
             })
             .on("click", function() {
                 let currentWeight = d3.select(this).attr("font-weight"); // 取得當前字重
@@ -533,6 +535,7 @@
         snap : null,
         pizzaRect: {},
         profile: {},
-        locateMapping : [12,8,4,0,1,2,3,7,11,15,14,13]
+        locateMapping : [12,8,4,0,1,2,3,7,11,15,14,13],
+        rectGroupsArray : []
     });
 })(jQuery);
