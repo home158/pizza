@@ -144,13 +144,13 @@
                         .transition().duration(200)
                         .attr("fill", newColor);
                 });
-                let rectCenterGroups = base.snap
+            base.rectCenterGroups = base.snap
                 .append("g")
                 .attr("class", "center-group")
                 .attr("transform", (d,i) => {
                     return `translate(${tmpLocate[5].x}, ${tmpLocate[5].y})`;
                 })
-                .append("rect")
+            base.rectCenterGroups.append("rect")
                 .attr("width", base.pizzaRect.w*2)
                 .attr("height", base.pizzaRect.h*2)
                 .attr("fill", "white")
@@ -345,9 +345,67 @@
                 }
             }
         },
-
-        
         textProfileLayout: function(elem){
+            var that = this;
+                base = that.getData( elem );
+            /**********************************************/
+            var o;
+            o = base.options.profile;
+            textGroups = base.rectCenterGroups.selectAll("g")
+                .data(o.data)
+                .enter()
+                .append("g") // 先創建 g 元素
+            textGroups.each(function (d, i) {
+                let group = d3.select(this);
+                let textElem = group.append("text")
+                    .text(d)
+                    .attr("font-family", "GenShinGothicRegular")
+                    .attr("visibility", "visible")
+                    .attr("writing-mode", o.alignment[i]?.mode || "tb");
+            
+                // 設定 text 位置
+                let grid = that.retvieveRelativePosition(elem, o.alignment[i], textElem);
+                textElem.attr("x", grid.x).attr("y", grid.y);
+
+                // 取得 text 的邊界框來設定 rect
+                let bbox = textElem.node().getBBox();
+                let bgRect = group.insert("rect", "text")
+                    .attr("x", bbox.x - 3)
+                    .attr("y", bbox.y - 3)
+                    .attr("rx", 15)
+                    .attr("width", bbox.width + 6)
+                    .attr("height", bbox.height + 6)
+                    .attr("fill", "yellow")
+                    .attr("visibility", "hidden");
+
+                // 點擊事件：背景顯示
+                textElem.on("click", function() {
+                    let bgVisibility = bgRect.attr("visibility") === "hidden" ? "visible" : "hidden";
+                    bgRect.attr("visibility", bgVisibility);
+                });
+            })
+/*
+            textGroups.append("text") // 在 g 內添加 text
+                .text(d => d)
+                .attr("font-family", "GenShinGothicRegular")
+                .attr("visibility", "visible")
+                .attr("writing-mode", (d, i) => o.alignment[i]?.mode || "tb")
+                .each(function (d, i) {
+                    let textElem = d3.select(this);
+                    let grid = that.retvieveRelativePosition(elem, o.alignment[i], textElem);
+                    textElem.attr("x", grid.x).attr("y", grid.y);
+                });
+            textGroups.append("rect") // 在 g 內添加 text
+                .data(o.data)
+                .enter()
+                .each(function (d, i) {
+                    let textElem = d3.select(this);
+                    let grid = that.retvieveRelativePosition(elem, o.alignment[i], textElem);
+                    textElem.attr("x", grid.x).attr("y", grid.y);
+                });
+*/
+        },
+        _textProfileLayout: function(elem){
             var that = this;
                 base = that.getData( elem );
             /**********************************************/
@@ -536,6 +594,7 @@
         pizzaRect: {},
         profile: {},
         locateMapping : [12,8,4,0,1,2,3,7,11,15,14,13],
-        rectGroupsArray : []
+        rectGroupsArray : [],
+        rectCenterGroups: {}
     });
 })(jQuery);
